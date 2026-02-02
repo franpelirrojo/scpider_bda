@@ -29,8 +29,9 @@ class NoticiasSpider(scrapy.Spider):
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super().from_crawler(crawler, *args, **kwargs)
         if "feeds" in kwargs:
+            feeds = kwargs['feeds']
             spider.settings.set(
-                "FEEDS", {kwargs['feeds'] : {'format': 'csv', 'overwrite': True}}, priority="spider")
+                "FEEDS", {feeds['output_file'] : {'format': feeds['format'], 'overwrite': feeds['overwrite']}}, priority="spider")
         return spider
 
 
@@ -48,7 +49,7 @@ def run(periodicos):
     process = CrawlerProcess(settings)
 
     for config in periodicos:
-        process.crawl(NoticiasSpider, config=config, feeds=config['output_file'])
+        process.crawl(NoticiasSpider, config=config, feeds=config['feeds'])
 
     process.start()
 
@@ -65,29 +66,42 @@ if __name__ == "__main__":
                 "autor": "p.authors>a::text",
                 "date": "div.date>span.day::text",
                 "hour": "div.date>span.hour::text"
+            },
+            "feeds" : {
+                "output_file": "eldiario.json",
+                "format" : "json",
+                "overwrite": True
             }
         },
         {
             "allowed_domains": ["elpais.com", "www.elpais.com", "cincodisas.es"],
             "start_urls": ["https://elpais.com/"],
-            "output_file": "elpais.csv",
             "noticias_link": "article *.c_t>a::attr(href)",
             "fields": {
                 "title": "h1.a_t::text",
                 "description": "p.a_st::text",
                 "autor": "div[data-dtm-region=articulo_firma] > a::text",
                 "date": "a[data-date]::attr(data-date)"
+            },
+            "feeds" : {
+                "output_file": "elpais.csv",
+                "format" : "csv",
+                "overwrite": True
             }
         },
         {
             "allowed_domains": ["diariosocialista.net"],
             "start_urls": ["https://diariosocialista.net/"],
-            "output_file": "ds.csv",
             "noticias_link": "*.cover-widget-item-title>a::attr(href)",
             "fields": {
                 "title": "h1.post-title::text",
                 "description": "div.post-excerpt>p::text",
                 "date": "div.post-meta-date::text"
+            },
+            "feeds" : {
+                "output_file": "ds.csv",
+                "format" : "csv",
+                "overwrite": True
             }
         }
     ]
