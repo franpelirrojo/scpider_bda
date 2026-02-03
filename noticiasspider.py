@@ -8,11 +8,11 @@ class NoticiasSpider(scrapy.Spider):
         super(NoticiasSpider, self).__init__(*args, **kwargs)
         self.allowed_domains = config.get("allowed_domains")
         self.start_urls = config.get("start_urls")
-        self.noticias_link = config.get("noticias_link")
+        self.noticias_link = config.get("noticias_link") #En xpath por la tarea
         self.fields = config.get("fields")
 
     def parse(self, response):
-        noticias = response.css(self.noticias_link).getall()
+        noticias = response.xpath(self.noticias_link).getall()
         yield from response.follow_all(noticias, callback=self.parse_noticia)
 
     def parse_noticia(self, response):
@@ -59,7 +59,7 @@ if __name__ == "__main__":
             "allowed_domains": ["www.eldiario.es", "eldiario.es"],
             "start_urls": ["https://www.eldiario.es/"],
             "output_file": "eldiario.csv",
-            "noticias_link": "h2>a::attr(href)",
+            "noticias_link": "//h2/a/@href", #En xpath por la tarea
             "fields": {
                 "title": "h1.title::text",
                 "description": "ul.footer h2::text",
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         {
             "allowed_domains": ["elpais.com", "www.elpais.com", "cincodisas.es"],
             "start_urls": ["https://elpais.com/"],
-            "noticias_link": "article *.c_t>a::attr(href)",
+            "noticias_link": "//article//*[contains(concat(' ', normalize-space(@class), ' '), ' c_t ')]/a/@href", #En xpath por la tarea
             "fields": {
                 "title": "h1.a_t::text",
                 "description": "p.a_st::text",
@@ -84,23 +84,23 @@ if __name__ == "__main__":
                 "date": "a[data-date]::attr(data-date)"
             },
             "feeds" : {
-                "output_file": "elpais.csv",
-                "format" : "csv",
+                "output_file": "elpais.json",
+                "format" : "json",
                 "overwrite": True
             }
         },
         {
             "allowed_domains": ["diariosocialista.net"],
             "start_urls": ["https://diariosocialista.net/"],
-            "noticias_link": "*.cover-widget-item-title>a::attr(href)",
+            "noticias_link": "//*[contains(concat(' ', normalize-space(@class), ' '), ' cover-widget-item-title ')]/a/@href", #En xpath por la tarea
             "fields": {
                 "title": "h1.post-title::text",
                 "description": "div.post-excerpt>p::text",
                 "date": "div.post-meta-date::text"
             },
             "feeds" : {
-                "output_file": "ds.csv",
-                "format" : "csv",
+                "output_file": "ds.json",
+                "format" : "json",
                 "overwrite": True
             }
         }
