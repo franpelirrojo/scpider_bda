@@ -58,7 +58,6 @@ if __name__ == "__main__":
         {
             "allowed_domains": ["www.eldiario.es", "eldiario.es"],
             "start_urls": ["https://www.eldiario.es/"],
-            "output_file": "eldiario.csv",
             "noticias_link": "//h2/a/@href", #En xpath por la tarea
             "fields": {
                 "title": "h1.title::text",
